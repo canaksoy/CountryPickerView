@@ -41,11 +41,13 @@ class DemoViewController: UITableViewController {
         cpvTextField.tag = 2
         cpvIndependent.tag = 3
         
+        
         [cpvMain, cpvTextField, cpvIndependent, cpvInternal].forEach {
             $0?.dataSource = self
         }
         
         cpvInternal.delegate = self
+        cpvIndependent.delegate = self
         cpvMain.font = UIFont.systemFont(ofSize: 20)
         
         [showPhoneCodeInView, showCountryCodeInView, showCountryNameInView,
@@ -111,6 +113,10 @@ class DemoViewController: UITableViewController {
 }
 
 extension DemoViewController: CountryPickerViewDelegate {
+    func countryPickerView(_ countryPickerView: CountryPickerView, didSelectCountries countries: [Country]) {
+        print("Selected Countries: \(countries.compactMap({$0.name}).joined(separator: ","))")
+    }
+    
     func countryPickerView(_ countryPickerView: CountryPickerView, didSelectCountry country: Country) {
         // Only countryPickerInternal has it's delegate set
         let title = "Selected Country"
@@ -159,6 +165,10 @@ extension DemoViewController: CountryPickerViewDataSource {
     
     func showCountryCodeInList(in countryPickerView: CountryPickerView) -> Bool {
        return countryPickerView.tag == cpvMain.tag && showCountryCodeInList.isOn
+    }
+    
+    func allowsMultipleSelection(in countryPickerView: CountryPickerView) -> Bool {
+        return true
     }
 }
 

@@ -81,6 +81,12 @@ extension CountryPickerViewController {
             closeButton.target = self
             closeButton.action = #selector(close)
             navigationItem.leftBarButtonItem = closeButton
+            
+            // Add a done button if this is the root view controller and selection is multiple
+            let doneButton = dataSource.doneButtonNavigationItem
+            doneButton.target = self
+            doneButton.action = #selector(done)
+            navigationItem.rightBarButtonItem = doneButton
         }
     }
     
@@ -106,6 +112,18 @@ extension CountryPickerViewController {
     
     @objc private func close() {
         self.navigationController?.dismiss(animated: true, completion: nil)
+    }
+    
+    @objc private func done() {
+        searchController?.isActive = false
+        searchController?.dismiss(animated: false, completion: nil)
+        
+        // If this is root, dismiss, else pop
+        if navigationController?.viewControllers.count == 1 {
+            navigationController?.dismiss(animated: true, completion: nil)
+        } else {
+            navigationController?.popViewController(animated: true)
+        }
     }
 }
 
@@ -149,8 +167,13 @@ extension CountryPickerViewController {
         if let color = dataSource.cellLabelColor {
             cell.textLabel?.textColor = color
         }
-        cell.accessoryType = country == countryPickerView.selectedCountry &&
+        if dataSource.allowsMultipleSelection {
+            cell.accessoryType = countryPickerView.selectedCountries.contains(country) &&
             dataSource.showCheckmarkInList ? .checkmark : .none
+        } else {
+            cell.accessoryType = country == countryPickerView.selectedCountry &&
+            dataSource.showCheckmarkInList ? .checkmark : .none
+        }
         cell.separatorInset = .zero
         return cell
     }
@@ -191,18 +214,34 @@ extension CountryPickerViewController {
         tableView.deselectRow(at: indexPath, animated: true)
         let country = isSearchMode ? searchResults[indexPath.row]
             : countries[sectionsTitles[indexPath.section]]![indexPath.row]
-
-        searchController?.isActive = false
-        searchController?.dismiss(animated: false, completion: nil)
         
-        let completion = {
-            self.countryPickerView.selectedCountry = country
-        }
-        // If this is root, dismiss, else pop
-        if navigationController?.viewControllers.count == 1 {
-            navigationController?.dismiss(animated: true, completion: completion)
+        if dataSource.allowsMultipleSelection {
+            
+            if !self.countryPickerView.selectedCountries.contains(country) {
+                self.countryPickerView.selectedCountries.append(country)
+            } else {
+                if let index = self.countryPickerView.selectedCountries.firstIndex(of: country) {
+                    self.countryPickerView.selectedCountries.remove(at: index)
+                }
+            }
+            
+            tableView.reloadData()
+            
         } else {
-            navigationController?.popViewController(animated: true, completion: completion)
+            
+            searchController?.isActive = false
+            searchController?.dismiss(animated: false, completion: nil)
+            
+            let completion = {
+                self.countryPickerView.selectedCountry = country
+            }
+            // If this is root, dismiss, else pop
+            if navigationController?.viewControllers.count == 1 {
+                navigationController?.dismiss(animated: true, completion: completion)
+            } else {
+                navigationController?.popViewController(animated: true, completion: completion)
+            }
+            
         }
     }
 }
@@ -332,6 +371,13 @@ class CountryPickerViewDataSourceInternal: CountryPickerViewDataSource {
         return button
     }
     
+    var doneButtonNavigationItem: UIBarButtonItem {
+        guard let button = view.dataSource?.doneButtonNavigationItem(in: view) else {
+            return UIBarButtonItem(title: "Done", style: .done, target: nil, action: nil)
+        }
+        return button
+    }
+    
     var searchBarPosition: SearchBarPosition {
         return view.dataSource?.searchBarPosition(in: view) ?? searchBarPosition(in: view)
     }
@@ -354,5 +400,9 @@ class CountryPickerViewDataSourceInternal: CountryPickerViewDataSource {
     
     var excludedCountries: [Country] {
         return view.dataSource?.excludedCountries(in: view) ?? excludedCountries(in: view)
+    }
+    
+    var allowsMultipleSelection: Bool {
+        return view.dataSource?.allowsMultipleSelection(in: view) ?? allowsMultipleSelection(in: view)
     }
 }

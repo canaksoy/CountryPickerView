@@ -1,4 +1,4 @@
-# CountryPickerView (Allow Multiple Selection)
+# CountryPickerView (Allows Multiple Selection)
 
 [![Build Status](https://travis-ci.org/kizitonwose/CountryPickerView.svg?branch=master)](https://travis-ci.org/kizitonwose/CountryPickerView)
 [![Platform](https://img.shields.io/badge/Platform-iOS-00BCD4.svg)](http://cocoapods.org/pods/CountryPickerView)

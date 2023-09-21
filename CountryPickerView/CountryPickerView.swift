@@ -111,6 +111,18 @@ public class CountryPickerView: NibView {
         }
     }
     
+    fileprivate var _selectedCountries = [Country]()
+    internal(set) public var selectedCountries: [Country] {
+        get {
+            return _selectedCountries
+        }
+        set {
+            _selectedCountries = newValue
+            delegate?.countryPickerView(self, didSelectCountries: newValue)
+            setup()
+        }
+    }
+    
     override public init(frame: CGRect) {
         super.init(frame: frame)
         setup()

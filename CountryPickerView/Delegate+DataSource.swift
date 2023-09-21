@@ -8,9 +8,12 @@
 
 import UIKit
 
-public protocol CountryPickerViewDelegate: class {
+public protocol CountryPickerViewDelegate: AnyObject {
     /// Called when the user selects a country from the list.
     func countryPickerView(_ countryPickerView: CountryPickerView, didSelectCountry country: Country)
+    
+    /// Called when the user selects countries from the list.
+    func countryPickerView(_ countryPickerView: CountryPickerView, didSelectCountries countries: [Country])
     
     /// Called before the internal CountryPickerViewController is presented or pushed.
     /// If the CountryPickerViewController is presented(not pushed), it is embedded in a UINavigationController.
@@ -23,7 +26,7 @@ public protocol CountryPickerViewDelegate: class {
     func countryPickerView(_ countryPickerView: CountryPickerView, didShow viewController: CountryPickerViewController)
 }
 
-public protocol CountryPickerViewDataSource: class {
+public protocol CountryPickerViewDataSource: AnyObject {
     /// An array of countries you wish to show at the top of the list.
     /// This is useful if your app is targeted towards people in specific countries.
     /// - requires: The title for the section to be returned in `sectionTitleForPreferredCountries`
@@ -63,6 +66,10 @@ public protocol CountryPickerViewDataSource: class {
     /// Return `nil` to use a default "Close" button.
     func closeButtonNavigationItem(in countryPickerView: CountryPickerView) -> UIBarButtonItem?
     
+    /// A navigation item button to be used if the internal view controller is presented(not pushed).
+    /// Return `nil` to use a default "Done" button.
+    func doneButtonNavigationItem(in countryPickerView: CountryPickerView) -> UIBarButtonItem?
+    
     /// The desired position for the search bar.
     func searchBarPosition(in countryPickerView: CountryPickerView) -> SearchBarPosition
     
@@ -82,6 +89,10 @@ public protocol CountryPickerViewDataSource: class {
     
     /// An array of countries you wish to exclude from the list of countries.
     func excludedCountries(in countryPickerView: CountryPickerView) -> [Country]
+    
+    /// Determines if multiple
+    func allowsMultipleSelection(in countryPickerView: CountryPickerView) -> Bool
+    
 }
 
 // MARK:- CountryPickerViewDataSource default implementations
@@ -131,6 +142,10 @@ public extension CountryPickerViewDataSource {
         return nil
     }
     
+    func doneButtonNavigationItem(in countryPickerView: CountryPickerView) -> UIBarButtonItem? {
+        return nil
+    }
+    
     func searchBarPosition(in countryPickerView: CountryPickerView) -> SearchBarPosition {
         return .tableViewHeader
     }
@@ -153,6 +168,10 @@ public extension CountryPickerViewDataSource {
     
     func excludedCountries(in countryPickerView: CountryPickerView) -> [Country] {
         return []
+    }
+    
+    func allowsMultipleSelection(in countryPickerView: CountryPickerView) -> Bool {
+        return false
     }
 }
 
