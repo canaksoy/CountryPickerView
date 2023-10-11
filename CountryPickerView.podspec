@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
 
   spec.name         = "CountryPickerView"
-  spec.version      = "3.3.1"
+  spec.version      = "3.3.2"
   spec.summary      = "(Allows Multiple Selection) A simple, customizable view for selecting countries in iOS apps."
   spec.homepage     = "https://github.com/canaksoy/CountryPickerView"
   spec.license      = "MIT"

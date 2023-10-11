@@ -33,6 +33,8 @@ public class CountryPickerViewController: UITableViewController {
     override public func viewDidLoad() {
         super.viewDidLoad()
         
+        extendedLayoutIncludesOpaqueBars = true
+        
         prepareTableItems()
         prepareNavItem()
         prepareSearchBar()
